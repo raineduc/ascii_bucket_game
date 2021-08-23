@@ -29,9 +29,7 @@ object Shape {
     (pow(b1.center.x - b2.center.x, 2) + pow(b1.center.y - b2.center.y, 2)) < pow(sumOfRadii, 2)
   }
 
-  private def ballToAABBCollision(ball: CircleShape, shape: AABBShape): Boolean = {
-    false
-  }
+  private def ballToAABBCollision(ball: CircleShape, shape: AABBShape): Boolean = ???
 
   private def AABBtoAABBCollision(s1: AABBShape, s2: AABBShape): Boolean = {
     if (s1.topLeft.x > s2.rightBottom.x || s1.rightBottom.x < s2.topLeft.x) false

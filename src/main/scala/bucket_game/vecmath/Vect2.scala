@@ -18,6 +18,8 @@ final case class Vect2(x: Double, y: Double) {
     Vect2(x - that.x, y - that.y)
   }
 
+  def *(coef: Double): Vect2 = Vect2(x * coef, y * coef)
+
   def dotProduct(that: Vect2): Double = {
     if (isZero && that.isZero) 0
     else x * that.x + y * that.y

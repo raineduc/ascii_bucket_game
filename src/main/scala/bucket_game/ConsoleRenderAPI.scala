@@ -1,20 +1,54 @@
 package bucket_game
 
 import bucket_game.components.Component
+import bucket_game.domain.Body
 
 class ConsoleRenderAPI(
-  private val width: Int,
-  private val height: Int
+  val width: Int,
+  val height: Int
 ) {
-  private val matrix: Array[Array[Char]] = {
-    (for (_ <- 0 until height) yield {
-      new Array[Char](width)
-    }).toArray
+  val matrix: Array[Array[Char]] = Array.fill[Char](height, width)(' ')
+
+  initTerminal()
+
+  private def initTerminal(): Unit = {
+//    print(f"\u001b[${height}T")
+    print(f"\u001b[${height}S")
+    print(s"\u001b[${height}A")
+    print("\u001b[s")
   }
 
-  def renderScene(elems: List[Component[_]]): Unit = {
-    for (body <- elems) {
-      body.render()
+  private def clearTerminal(): Unit = {
+    print("\u001b[u")
+  }
+
+  private def clearMatrix(): Unit = {
+    for {
+      y <- 0 until height
+      x <- 0 until width
+    } matrix(y)(x) = ' '
+  }
+
+  private def renderScreen(): Unit = {
+    print(
+      matrix.map(line => line.mkString("")).mkString("\n")
+    )
+  }
+
+  def renderScene(elems: List[Component[_ <: Body]]): Unit = {
+    clear()
+    for (component <- elems) {
+      component.render()
     }
+    renderScreen()
+  }
+
+  def setPixel(x: Int, y: Int, char: Char): Unit = {
+    if (x >= 0 && x <= width && y >= 0 && y <= height) matrix(y)(x) = char
+  }
+
+  def clear(): Unit = {
+    clearMatrix()
+    clearTerminal()
   }
 }

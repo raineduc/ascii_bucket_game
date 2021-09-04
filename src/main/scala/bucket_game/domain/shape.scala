@@ -5,22 +5,30 @@ import bucket_game.vecmath.Vect2
 import scala.math.{pow, random}
 
 sealed abstract class Shape(
-                           val topLeft: Vect2,
-                           val rightBottom: Vect2
-                           )
+                           var topLeft: Vect2,
+                           var rightBottom: Vect2
+                           ) {
+  protected[domain] def changePosition(pos: Vect2): Unit = {
+    val delta = pos - topLeft
+    topLeft += delta
+    rightBottom += delta
+  }
+}
 
-class AABBShape(
-                 override val topLeft: Vect2,
-                 override val rightBottom: Vect2
-               ) extends Shape(topLeft, rightBottom)
+class AABBShape(val tl: Vect2, val rb: Vect2) extends Shape(tl, rb)
 
 class CircleShape(
-                 val center: Vect2,
-                 val radius: Float
+                 var center: Vect2,
+                 var radius: Float
                ) extends Shape(
   center - Vect2(radius, radius),
   center + Vect2(radius, radius)
-)
+) {
+  override protected[domain] def changePosition(pos: Vect2): Unit = {
+    super.changePosition(pos)
+    center = pos + Vect2(radius, radius)
+  }
+}
 
 
 object Shape {

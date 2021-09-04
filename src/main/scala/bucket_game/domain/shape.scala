@@ -2,7 +2,7 @@ package bucket_game.domain
 
 import bucket_game.vecmath.Vect2
 
-import scala.math.{pow, random}
+import scala.math.{pow, Pi}
 
 sealed abstract class Shape(
                            var topLeft: Vect2,
@@ -13,9 +13,14 @@ sealed abstract class Shape(
     topLeft += delta
     rightBottom += delta
   }
+  def calculateArea: Float
+
+  def calculateMass(density: Float): Float = calculateArea * density
 }
 
-class AABBShape(val tl: Vect2, val rb: Vect2) extends Shape(tl, rb)
+class AABBShape(tl: Vect2, rb: Vect2) extends Shape(tl, rb) {
+  def calculateArea: Float = ((rightBottom.x - topLeft.x) * (topLeft.y - rightBottom.y)).toFloat
+}
 
 class CircleShape(
                  var center: Vect2,
@@ -28,6 +33,8 @@ class CircleShape(
     super.changePosition(pos)
     center = pos + Vect2(radius, radius)
   }
+
+  def calculateArea: Float = (Pi * pow(radius, 2)).toFloat
 }
 
 

@@ -8,7 +8,8 @@ class Ball(
             val centerPos: Vect2
           ) extends Body {
   override val shape: CircleShape = new CircleShape(centerPos, radius)
-  val mass: Float = 5
+  val density: Float = 0.5f
+  val mass: Float = shape.calculateMass(density)
   val restitution: Float = 1
 
   def this(radius: Float, centerPos: Vect2) = this(Vect2(0, 0), radius, centerPos)

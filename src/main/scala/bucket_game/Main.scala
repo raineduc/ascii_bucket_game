@@ -16,7 +16,7 @@ object Main extends App {
   val physicsAPI = new PhysicsAPI()
 
   val components = List(
-    new BallComponent(new Ball(Vect2(10, 10), 5, Vect2(8, 5)), new BallRenderer(consoleRenderAPI))
+    new BallComponent(new Ball(Vect2(20, -20), 5, Vect2(8, 45)), new BallRenderer(consoleRenderAPI))
   )
 
   var frameStart = Instant.now()

@@ -2,6 +2,7 @@ package bucket_game
 
 import bucket_game.components.Component
 import bucket_game.domain.Body
+import bucket_game.vecmath.Vect2
 
 class ConsoleRenderAPI(
   val width: Int,
@@ -35,6 +36,10 @@ class ConsoleRenderAPI(
     )
   }
 
+  def cartesianToConsole(vect: Vect2): Vect2 = {
+    Vect2(vect.x, height - vect.y - 1)
+  }
+
   def renderScene(elems: List[Component[_ <: Body]]): Unit = {
     clear()
     for (component <- elems) {
@@ -44,7 +49,7 @@ class ConsoleRenderAPI(
   }
 
   def setPixel(x: Int, y: Int, char: Char): Unit = {
-    if (x >= 0 && x <= width && y >= 0 && y <= height) matrix(y)(x) = char
+    if (x >= 0 && x < width && y >= 0 && y < height) matrix(y)(x) = char
   }
 
   def clear(): Unit = {

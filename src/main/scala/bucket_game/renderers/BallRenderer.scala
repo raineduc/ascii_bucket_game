@@ -21,7 +21,7 @@ class BallRenderer(
   private val splittedTexture = texture.split("(\r\n)|\n").map(line => line.zipWithIndex).zipWithIndex
 
   def render(body: Ball): Unit = {
-    val Vect2(left, top) = renderAPI.cartesianToConsole(body.shape.topLeft)
+    val (left, top) = renderAPI.cartesianToConsole(body.position)
 
     for {
       (line, heightOffset) <- splittedTexture
@@ -29,7 +29,7 @@ class BallRenderer(
       (char, widthOffset) <- line
       if (left + widthOffset) <= renderAPI.width && char != ' '
     } {
-      renderAPI.setPixel((left + widthOffset).round.toInt, (top + heightOffset).round.toInt, char)
+      renderAPI.setPixel(left + widthOffset, top + heightOffset, char)
     }
   }
 }

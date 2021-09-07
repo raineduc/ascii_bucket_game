@@ -36,8 +36,8 @@ class ConsoleRenderAPI(
     )
   }
 
-  def cartesianToConsole(vect: Vect2): Vect2 = {
-    Vect2(vect.x, height - vect.y - 1)
+  def cartesianToConsole(vect: Vect2): (Int, Int) = {
+    (vect.x.round.toInt, (height - vect.y - 1).round.toInt)
   }
 
   def renderScene(elems: List[Component[_ <: Body]]): Unit = {

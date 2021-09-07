@@ -18,7 +18,7 @@ sealed abstract class Shape(
   def calculateMass(density: Float): Float = calculateArea * density
 }
 
-class AABBShape(tl: Vect2, rb: Vect2) extends Shape(tl, rb) {
+class AABBShape(topLeft: Vect2, rightBottom: Vect2) extends Shape(topLeft, rightBottom) {
   def calculateArea: Float = ((rightBottom.x - topLeft.x) * (topLeft.y - rightBottom.y)).toFloat
 }
 
@@ -37,7 +37,6 @@ class CircleShape(
   def calculateArea: Float = (Pi * pow(radius, 2)).toFloat
 }
 
-
 object Shape {
   private def ballToBallCollision(b1: CircleShape, b2: CircleShape): Boolean = {
     val sumOfRadii = b1.radius + b2.radius
@@ -51,7 +50,6 @@ object Shape {
     else if (s1.topLeft.y > s2.rightBottom.y || s1.rightBottom.y < s2.topLeft.y) false
     else true
   }
-
 
   def defineCollision(shape1: Shape, shape2: Shape): Boolean = (shape1, shape2) match {
     case (s1: CircleShape, s2: CircleShape) => ballToBallCollision(s1, s2)

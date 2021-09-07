@@ -2,9 +2,9 @@ package bucket_game
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import bucket_game.components.BallComponent
-import bucket_game.domain.Ball
-import bucket_game.renderers.BallRenderer
+import bucket_game.components.Component
+import bucket_game.domain.{Ball, Wall}
+import bucket_game.renderers.{BallRenderer, WallRenderer}
 import bucket_game.vecmath.Vect2
 
 object Main extends App {
@@ -15,8 +15,12 @@ object Main extends App {
   val consoleRenderAPI = new ConsoleRenderAPI(100, 50)
   val physicsAPI = new PhysicsAPI()
 
+  val wallRenderer = new WallRenderer(consoleRenderAPI)
+
   val components = List(
-    new BallComponent(new Ball(Vect2(20, -20), 5, Vect2(8, 45)), new BallRenderer(consoleRenderAPI))
+    new Component[Ball](new Ball(Vect2(20, -20), 5, Vect2(8, 45)), new BallRenderer(consoleRenderAPI)),
+    new Component[Wall](new Wall(Vect2(0, 49), 100, true), wallRenderer),
+    new Component[Wall](new Wall(Vect2(99, 48), 50), wallRenderer)
   )
 
   var frameStart = Instant.now()

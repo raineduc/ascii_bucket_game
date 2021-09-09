@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit
 import bucket_game.components.Component
 import bucket_game.domain.{Ball, Wall}
 import bucket_game.renderers.{BallRenderer, WallRenderer}
-import bucket_game.vecmath.Vect2
+import bucket_game.lib.vecmath.Vect2
 
 object Main extends App {
   val fps = 60
@@ -18,9 +18,11 @@ object Main extends App {
   val wallRenderer = new WallRenderer(consoleRenderAPI)
 
   val components = List(
-    new Component[Ball](new Ball(Vect2(20, -20), 5, Vect2(8, 45)), new BallRenderer(consoleRenderAPI)),
+    new Component[Ball](new Ball(Vect2(20, -20), Vect2(8, 45)), new BallRenderer(consoleRenderAPI)),
     new Component[Wall](new Wall(Vect2(0, 49), 100, true), wallRenderer),
-    new Component[Wall](new Wall(Vect2(99, 48), 50), wallRenderer)
+    new Component[Wall](new Wall(Vect2(99, 48), 49), wallRenderer),
+    new Component[Wall](new Wall(Vect2(1, 0), 98, true), wallRenderer),
+    new Component[Wall](new Wall(Vect2(0, 48), 48), wallRenderer)
   )
 
   var frameStart = Instant.now()
@@ -35,6 +37,6 @@ object Main extends App {
       accumulator -= dt
     }
     consoleRenderAPI.renderScene(components)
-    Thread.sleep(50)
+    Thread.sleep(100)
   }
 }

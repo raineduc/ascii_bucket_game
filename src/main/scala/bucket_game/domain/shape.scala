@@ -1,8 +1,9 @@
 package bucket_game.domain
 
-import bucket_game.vecmath.Vect2
+import bucket_game.domain.Collision.{CollisionFactory, buildCollision}
+import bucket_game.lib.vecmath.Vect2
 
-import scala.math.{pow, Pi}
+import scala.math.{Pi, abs, max, min, pow, signum, sqrt}
 
 sealed abstract class Shape(
                            var topLeft: Vect2,
@@ -10,7 +11,7 @@ sealed abstract class Shape(
                            ) {
   protected[domain] def changePosition(pos: Vect2): Unit = {
     val delta = pos - topLeft
-    topLeft += delta
+    topLeft = pos
     rightBottom += delta
   }
   def calculateArea: Float
@@ -19,42 +20,109 @@ sealed abstract class Shape(
 }
 
 class AABBShape(topLeft: Vect2, rightBottom: Vect2) extends Shape(topLeft, rightBottom) {
-  def calculateArea: Float = ((rightBottom.x - topLeft.x) * (topLeft.y - rightBottom.y)).toFloat
+  def centerPos: Vect2 = topLeft + (rightBottom - topLeft) * 0.5
+
+  def width: Double = rightBottom.x - topLeft.x
+  def height: Double = topLeft.y - rightBottom.y
+  def calculateArea: Float = (width * height).toFloat
 }
 
 class CircleShape(
                  var center: Vect2,
                  var radius: Float
                ) extends Shape(
-  center - Vect2(radius, radius),
-  center + Vect2(radius, radius)
+  center + Vect2(-radius, radius),
+  center + Vect2(radius, -radius)
 ) {
   override protected[domain] def changePosition(pos: Vect2): Unit = {
     super.changePosition(pos)
-    center = pos + Vect2(radius, radius)
+    center = pos + Vect2(radius, -radius)
   }
 
   def calculateArea: Float = (Pi * pow(radius, 2)).toFloat
 }
 
 object Shape {
-  private def ballToBallCollision(b1: CircleShape, b2: CircleShape): Boolean = {
-    val sumOfRadii = b1.radius + b2.radius
-    (pow(b1.center.x - b2.center.x, 2) + pow(b1.center.y - b2.center.y, 2)) < pow(sumOfRadii, 2)
+  private def ballToBallCollision(b1: CircleShape, b2: CircleShape): Option[CollisionFactory] = {
+    val normal = b2.center - b1.center
+    val squaredRadius = pow(b1.radius + b2.radius, 2)
+
+    if (normal.lengthSquared > squaredRadius) return None
+
+    val normalModule = normal.getModule
+
+    Some(buildCollision(if (normalModule != 0) normal.normalize else Vect2(1, 0)))
   }
 
-  private def ballToAABBCollision(ball: CircleShape, shape: AABBShape): Boolean = ???
+  private def ballToAABBCollision(aabb: AABBShape, circle: CircleShape): Option[CollisionFactory] = {
+    val centerVector = circle.center - aabb.centerPos
 
-  private def AABBtoAABBCollision(s1: AABBShape, s2: AABBShape): Boolean = {
-    if (s1.topLeft.x > s2.rightBottom.x || s1.rightBottom.x < s2.topLeft.x) false
-    else if (s1.topLeft.y > s2.rightBottom.y || s1.rightBottom.y < s2.topLeft.y) false
-    else true
+    var closestX = centerVector.x
+    var closestY = centerVector.y
+
+    val aabbHalfWidth = aabb.width / 2
+    val aabbHalfHeight = aabb.height / 2
+
+    closestX = min(aabbHalfWidth, max(closestX, -aabbHalfWidth))
+    closestY = min(aabbHalfHeight, max(closestY, -aabbHalfHeight))
+
+    var inside = false
+
+    if (centerVector == Vect2(closestX, closestY)) { // circle inside AABB
+      inside = true
+
+      if (abs(centerVector.x) > abs(centerVector.y)) {
+        closestX = if (closestX > 0) aabbHalfWidth else -aabbHalfWidth
+      } else {
+        closestY = if (closestY > 0) aabbHalfHeight else -aabbHalfHeight
+      }
+    }
+
+    val normal = centerVector - Vect2(closestX, closestY)
+    val distanceSquared = normal.lengthSquared
+
+    if (distanceSquared > circle.radius * circle.radius && !inside) return None
+
+    Some(buildCollision(if (inside) (normal * -1).normalize else normal.normalize))
   }
 
-  def defineCollision(shape1: Shape, shape2: Shape): Boolean = (shape1, shape2) match {
-    case (s1: CircleShape, s2: CircleShape) => ballToBallCollision(s1, s2)
-    case (s1: CircleShape, s2: AABBShape) => ballToAABBCollision(s1, s2)
-    case (s1: AABBShape, s2: CircleShape) => ballToAABBCollision(s2, s1)
-    case (s1: AABBShape, s2: AABBShape) => AABBtoAABBCollision(s1, s2)
+  private def AABBtoAABBCollision(s1: AABBShape, s2: AABBShape): Option[CollisionFactory] = {
+    val normal = s2.centerPos - s1.centerPos
+
+    val s1HalfWidth = s1.width / 2
+    val s2HalfWidth = s2.width / 2
+
+    val xOverlap = s1HalfWidth + s2HalfWidth - abs(normal.x)
+
+    if (xOverlap > 0) {
+      val s1HalfHeight = s1.height / 2
+      val s2HalfHeight = s2.height / 2
+
+      val yOverlap = s1HalfHeight + s2HalfHeight - abs(normal.y)
+
+      if (yOverlap > 0) {
+        val resultNormal =
+          if (xOverlap > yOverlap) Vect2(signum(normal.x), 0)
+          else Vect2(0, signum(normal.y))
+        return Some(buildCollision(resultNormal))
+      }
+    }
+    None
+  }
+
+  def defineCollision(body1: Body, body2: Body): Option[Collision] = {
+    val (result, directOrder) = (body1.shape, body2.shape) match {
+      case (s1: CircleShape, s2: CircleShape) => (ballToBallCollision(s1, s2), true)
+      case (s1: CircleShape, s2: AABBShape) => (ballToAABBCollision(s2, s1), false)
+      case (s1: AABBShape, s2: CircleShape) => (ballToAABBCollision(s1, s2), true)
+      case (s1: AABBShape, s2: AABBShape) => (AABBtoAABBCollision(s1, s2), true)
+    }
+
+    result match {
+      case Some(collisionFactory) =>
+        if (directOrder) Some(collisionFactory(body1, body2))
+        else Some(collisionFactory(body2, body1))
+      case None => None
+    }
   }
 }

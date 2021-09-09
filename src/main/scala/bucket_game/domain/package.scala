@@ -1,5 +1,5 @@
 package bucket_game
 
 package object domain {
-  val InfiniteMass: Float = -1f
+  val InfiniteMass: Float = 0
 }

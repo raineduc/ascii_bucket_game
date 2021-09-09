@@ -2,7 +2,7 @@ package bucket_game
 
 import bucket_game.components.Component
 import bucket_game.domain.Body
-import bucket_game.vecmath.Vect2
+import bucket_game.lib.vecmath.Vect2
 
 class ConsoleRenderAPI(
   val width: Int,

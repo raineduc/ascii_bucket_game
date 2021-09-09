@@ -3,19 +3,19 @@ package bucket_game.renderers
 import bucket_game.components.Renderer
 import bucket_game.domain.Ball
 import bucket_game.ConsoleRenderAPI
-import bucket_game.vecmath.Vect2
+import bucket_game.lib.vecmath.Vect2
 
 class BallRenderer(
                   private val renderAPI: ConsoleRenderAPI
                   ) extends Renderer[Ball] {
   private val texture =
     """
-    |    x  x
-    | x        x
-    |x          x
-    |x          x
-    | x        x
-    |    x  x
+    |  xx
+    | x  x
+    |x    x
+    |x    x
+    | x  x
+    |  xx
     """.stripMargin
 
   private val splittedTexture = texture.split("(\r\n)|\n").map(line => line.zipWithIndex).zipWithIndex

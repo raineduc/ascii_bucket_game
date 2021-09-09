@@ -1,4 +1,4 @@
-package bucket_game.vecmath
+package bucket_game.lib.vecmath
 
 import scala.math.{acos, pow, sqrt}
 
@@ -6,7 +6,11 @@ final case class Vect2(x: Double, y: Double) {
 
   def this() = this(0, 0)
 
-  def getModule: Double = sqrt(pow(x, 2) + pow(y, 2))
+  def lengthSquared: Double = pow(x, 2) + pow(y, 2)
+
+  def getModule: Double = sqrt(lengthSquared)
+
+  def normalize: Vect2 = this * (1 / getModule)
 
   def isZero: Boolean = x == 0 && y == 0
 

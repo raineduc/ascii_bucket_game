@@ -1,6 +1,6 @@
 package bucket_game.domain
 
-import bucket_game.vecmath.Vect2
+import bucket_game.lib.vecmath.Vect2
 
 class Wall(
             position: Vect2,
@@ -9,8 +9,8 @@ class Wall(
           ) extends Body {
   override var velocity: Vect2 = Vect2(0, 0)
   val shape: Shape = {
-    if (isHorizontal) new AABBShape(position, position + Vect2(position.x + length, position.y))
-    else new AABBShape(position, position + Vect2(position.x, position.y - length))
+    if (isHorizontal) new AABBShape(position, Vect2(position.x + length - 1, position.y))
+    else new AABBShape(position, Vect2(position.x, position.y - length + 1))
   }
   val density = 1f
   val mass = InfiniteMass

@@ -1,6 +1,6 @@
 package bucket_game.domain
 
-import bucket_game.vecmath.Vect2
+import bucket_game.lib.vecmath.Vect2
 
 abstract class Body {
   val shape: Shape

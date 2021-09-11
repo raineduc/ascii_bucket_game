@@ -8,6 +8,7 @@ abstract class Body {
   val mass: Float
   val restitution: Float
   var velocity: Vect2
+  var force: Vect2 = Vect2(0, 0)
 
   def position: Vect2 = shape.topLeft
 

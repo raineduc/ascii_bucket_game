@@ -2,7 +2,6 @@ package bucket_game
 
 import bucket_game.components.Component
 import bucket_game.domain.{Body, Collision, InfiniteMass, Shape}
-import bucket_game.lib.vecmath.Vect2
 
 import math.min
 
@@ -30,20 +29,25 @@ class PhysicsAPI {
     body2.velocity += impulseVector * invertedBody2Mass
   }
 
-  def updatePhysics(elems: List[Component[_ <: Body]], dt: Float): Unit = {
-    for (component <- elems) {
-      component.gameObject.position += component.gameObject.velocity * dt
+  def updatePhysics(scene: Scene): Unit = {
+    for (component <- scene.components) {
+      component.gameObject.position += component.gameObject.velocity * scene.dt
     }
 
     for {
-      (component1, idX) <- elems.zipWithIndex
-      (component2, idY) <- elems.zipWithIndex
+      (component1, idX) <- scene.components.zipWithIndex
+      (component2, idY) <- scene.components.zipWithIndex
       if idX < idY
     } {
       Shape.defineCollision(component1.gameObject, component2.gameObject) match {
         case Some(collision) => resolveCollision(collision)
         case _ =>
       }
+    }
+
+    for (component <- scene.components if component.gameObject.mass != InfiniteMass) {
+      val gameObject = component.gameObject
+      gameObject.velocity += scene.gravity * scene.dt
     }
   }
 }

@@ -7,12 +7,12 @@ class Wall(
             val length: Float,
             val isHorizontal: Boolean = false
           ) extends Body {
-  var velocity: Vect2 = Vect2(0, 0)
+  override var velocity: Vect2 = Vect2(0, 0)
   val shape: Shape = {
     if (isHorizontal) new AABBShape(position, Vect2(position.x + length - 1, position.y))
     else new AABBShape(position, Vect2(position.x, position.y - length + 1))
   }
   val density = 1f
-  val mass: Float = InfiniteMass
+  val mass = InfiniteMass
   val restitution = 0.7f
 }

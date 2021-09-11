@@ -40,9 +40,9 @@ class ConsoleRenderAPI(
     (vect.x.round.toInt, (height - vect.y - 1).round.toInt)
   }
 
-  def renderScene(scene: Scene): Unit = {
+  def renderScene(elems: List[Component[_ <: Body]]): Unit = {
     clear()
-    for (component <- scene.components) {
+    for (component <- elems) {
       component.render()
     }
     renderScreen()

@@ -3,7 +3,7 @@ package bucket_game.domain
 import bucket_game.domain.Collision.{CollisionFactory, buildCollision}
 import bucket_game.lib.vecmath.Vect2
 
-import scala.math.{Pi, abs, max, min, pow, signum}
+import scala.math.{Pi, abs, max, min, pow, signum, sqrt}
 
 sealed abstract class Shape(
                            var topLeft: Vect2,
@@ -40,26 +40,6 @@ class CircleShape(
   }
 
   def calculateArea: Float = (Pi * pow(radius, 2)).toFloat
-}
-
-private[domain] class Boundary(center: Vect2, radius: Float) {
-  private val left_vector = Vect2(center.x - radius, center.y)
-  private val right_vector = Vect2(center.x + radius, center.y)
-  val left = new AABBShape(left_vector, left_vector)
-  val right = new AABBShape(right_vector, right_vector)
-}
-
-class BucketShape(
-                  var center: Vect2,
-                  var radius: Float
-                 ) extends Shape(
-  center + Vect2(-radius, 0),
-  center + Vect2(radius, 0)
-) {
-  val boundary = new Boundary(center, radius)
-
-  override def calculateArea: Float = 2 * radius
-
 }
 
 object Shape {
@@ -130,35 +110,17 @@ object Shape {
     None
   }
 
-  private def bucketToShapeCollision(bucket: BucketShape, shape: Shape): Option[CollisionFactory] = {
-    val leftBorderCollision = matchCollisionMethod(bucket.boundary.left, shape)
-    val rightBorderCollision = matchCollisionMethod(bucket.boundary.right, shape)
-
-    (leftBorderCollision.factory, rightBorderCollision.factory) match {
-      case (Some(factory1), Some(factory2)) => Some(buildCollision(factory1.normal + factory2.normal))
-      case (Some(factory1), None) => leftBorderCollision.factory
-      case (None, Some(factory2)) => rightBorderCollision.factory
-      case _ => None
-    }
-  }
-
-  case class CollisionMatchResult(factory: Option[CollisionFactory], directOrder: Boolean = true)
-
-  private def matchCollisionMethod(shape1: Shape, shape2: Shape): CollisionMatchResult = (shape1, shape2) match {
-    case (s1: BucketShape, s2: Shape) => CollisionMatchResult(bucketToShapeCollision(s1, s2))
-    case (s1: Shape, s2: BucketShape) => CollisionMatchResult(bucketToShapeCollision(s2, s1), directOrder = false)
-    case (s1: CircleShape, s2: CircleShape) => CollisionMatchResult(ballToBallCollision(s1, s2))
-    case (s1: CircleShape, s2: AABBShape) => CollisionMatchResult(ballToAABBCollision(s2, s1), directOrder = false)
-    case (s1: AABBShape, s2: CircleShape) => CollisionMatchResult(ballToAABBCollision(s1, s2))
-    case (s1: AABBShape, s2: AABBShape) => CollisionMatchResult(AABBtoAABBCollision(s1, s2))
-  }
-
   def defineCollision(body1: Body, body2: Body): Option[Collision] = {
-    val collisionMatchResult = matchCollisionMethod(body1.shape, body2.shape)
+    val (result, directOrder) = (body1.shape, body2.shape) match {
+      case (s1: CircleShape, s2: CircleShape) => (ballToBallCollision(s1, s2), true)
+      case (s1: CircleShape, s2: AABBShape) => (ballToAABBCollision(s2, s1), false)
+      case (s1: AABBShape, s2: CircleShape) => (ballToAABBCollision(s1, s2), true)
+      case (s1: AABBShape, s2: AABBShape) => (AABBtoAABBCollision(s1, s2), true)
+    }
 
-    collisionMatchResult.factory match {
+    result match {
       case Some(collisionFactory) =>
-        if (collisionMatchResult.directOrder) Some(collisionFactory(body1, body2))
+        if (directOrder) Some(collisionFactory(body1, body2))
         else Some(collisionFactory(body2, body1))
       case None => None
     }

@@ -9,11 +9,9 @@ class Collision(
                )
 
 object Collision {
-  private[domain] class CollisionFactory(val normal: Vect2) {
-    def apply(firstBody: Body, secondBody: Body): Collision = {
-      new Collision(firstBody, secondBody, normal)
-    }
-  }
+  private[domain] type CollisionFactory = (Body, Body) => Collision
 
-  private[domain] def buildCollision(normal: Vect2) = new CollisionFactory(normal)
+  private[domain] def buildCollision(normal: Vect2)(firstBody: Body, secondBody: Body): Collision = {
+    new Collision(firstBody, secondBody, normal)
+  }
 }

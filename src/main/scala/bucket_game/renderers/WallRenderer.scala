@@ -10,26 +10,20 @@ class WallRenderer(
   private def renderHorizontalWall(body: Wall): Unit = {
     val (left, top) = renderAPI.cartesianToConsole(body.position)
 
-    if (top >= 0 && top < renderAPI.height) {
-      for {
-        x <- left until (left + body.length).round.toInt
-        if x >= 0 && x < renderAPI.width
-      } {
-        renderAPI.setPixel(x, top, '-');
-      }
+    for {
+      x <- left until (left + body.length).round
+    } {
+      renderAPI.setPixel(x, top, '-');
     }
   }
 
   private def renderVerticalWall(body: Wall): Unit = {
     val (left, top) = renderAPI.cartesianToConsole(body.position)
 
-    if (left >= 0 && left < renderAPI.width) {
-      for {
-        y <- top until (top + body.length).round.toInt
-        if y >= 0 && y < renderAPI.height
-      } {
-        renderAPI.setPixel(left, y, '|');
-      }
+    for {
+      y <- top until (top + body.length).round
+    } {
+      renderAPI.setPixel(left, y, '|');
     }
   }
 

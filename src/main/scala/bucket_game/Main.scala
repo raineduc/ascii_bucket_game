@@ -18,7 +18,7 @@ object Main extends App {
   val wallRenderer = new WallRenderer(consoleRenderAPI)
 
   val components = List(
-    new Component[Ball](new Ball(Vect2(20, -20), Vect2(8, 40)), new BallRenderer(consoleRenderAPI)),
+    new Component[Ball](new Ball(Vect2(20, 20), Vect2(8, 40)), new BallRenderer(consoleRenderAPI)),
     new Component[Bucket](new Bucket(Vect2(80, 30), 6), new BucketRenderer(consoleRenderAPI)),
     new Component[Wall](new Wall(Vect2(0, 49), 100, true), wallRenderer),
     new Component[Wall](new Wall(Vect2(99, 48), 49), wallRenderer),
@@ -43,6 +43,6 @@ object Main extends App {
       accumulator -= dt
     }
     consoleRenderAPI.renderScene(scene)
-    Thread.sleep(100)
+    Thread.sleep(50)
   }
 }

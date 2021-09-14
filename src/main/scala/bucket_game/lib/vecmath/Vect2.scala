@@ -29,7 +29,11 @@ final case class Vect2(x: Double, y: Double) {
     else x * that.x + y * that.y
   }
 
+  def cosBetween(that: Vect2): Double = {
+    dotProduct(that) / getModule / that.getModule
+  }
+
   def angleBetween(that: Vect2): Double = {
-    acos(dotProduct(that) / getModule / that.getModule)
+    acos(cosBetween(that))
   }
 }

@@ -63,7 +63,7 @@ class BucketShape(
 }
 
 object Shape {
-  private def ballToBallCollision(b1: CircleShape, b2: CircleShape): Option[CollisionFactory] = {
+  private def circleToCircleCollision(b1: CircleShape, b2: CircleShape): Option[CollisionFactory] = {
     val normal = b2.center - b1.center
     val squaredRadius = pow(b1.radius + b2.radius, 2)
 
@@ -71,10 +71,14 @@ object Shape {
 
     val normalModule = normal.getModule
 
-    Some(buildCollision(if (normalModule != 0) normal.normalize else Vect2(1, 0)))
+    if (normalModule != 0) {
+      val penetration: Float = (squaredRadius - normalModule).toFloat
+      Some(buildCollision(normal.normalize, penetration))
+    }
+    else Some(buildCollision(Vect2(1, 0), b1.radius))
   }
 
-  private def ballToAABBCollision(aabb: AABBShape, circle: CircleShape): Option[CollisionFactory] = {
+  private def circleToAABBCollision(aabb: AABBShape, circle: CircleShape): Option[CollisionFactory] = {
     val centerVector = circle.center - aabb.centerPos
 
     var closestX = centerVector.x
@@ -103,7 +107,9 @@ object Shape {
 
     if (distanceSquared > circle.radius * circle.radius && !inside) return None
 
-    Some(buildCollision(if (inside) (normal * -1).normalize else normal.normalize))
+    val penetration = circle.radius - distanceSquared
+
+    Some(buildCollision(if (inside) (normal * -1).normalize else normal.normalize, penetration.toFloat))
   }
 
   private def AABBtoAABBCollision(s1: AABBShape, s2: AABBShape): Option[CollisionFactory] = {
@@ -121,10 +127,10 @@ object Shape {
       val yOverlap = s1HalfHeight + s2HalfHeight - abs(normal.y)
 
       if (yOverlap > 0) {
-        val resultNormal =
-          if (xOverlap > yOverlap) Vect2(signum(normal.x), 0)
-          else Vect2(0, signum(normal.y))
-        return Some(buildCollision(resultNormal))
+        val (resultNormal, penetration) =
+          if (xOverlap > yOverlap) (Vect2(signum(normal.x), 0), xOverlap)
+          else (Vect2(0, signum(normal.y)), yOverlap)
+        return Some(buildCollision(resultNormal, penetration.toFloat))
       }
     }
     None
@@ -135,9 +141,10 @@ object Shape {
     val rightBorderCollision = matchCollisionMethod(bucket.boundary.right, shape)
 
     (leftBorderCollision.factory, rightBorderCollision.factory) match {
-      case (Some(factory1), Some(factory2)) => Some(buildCollision(factory1.normal + factory2.normal))
-      case (Some(factory1), None) => leftBorderCollision.factory
-      case (None, Some(factory2)) => rightBorderCollision.factory
+      case (Some(factory1), Some(factory2)) =>
+        Some(buildCollision(factory1.normal + factory2.normal, max(factory1.penetration, factory2.penetration)))
+      case (Some(factory1), None) => Some(factory1)
+      case (None, Some(factory2)) => Some(factory2)
       case _ => None
     }
   }
@@ -147,9 +154,9 @@ object Shape {
   private def matchCollisionMethod(shape1: Shape, shape2: Shape): CollisionMatchResult = (shape1, shape2) match {
     case (s1: BucketShape, s2: Shape) => CollisionMatchResult(bucketToShapeCollision(s1, s2))
     case (s1: Shape, s2: BucketShape) => CollisionMatchResult(bucketToShapeCollision(s2, s1), directOrder = false)
-    case (s1: CircleShape, s2: CircleShape) => CollisionMatchResult(ballToBallCollision(s1, s2))
-    case (s1: CircleShape, s2: AABBShape) => CollisionMatchResult(ballToAABBCollision(s2, s1), directOrder = false)
-    case (s1: AABBShape, s2: CircleShape) => CollisionMatchResult(ballToAABBCollision(s1, s2))
+    case (s1: CircleShape, s2: CircleShape) => CollisionMatchResult(circleToCircleCollision(s1, s2))
+    case (s1: CircleShape, s2: AABBShape) => CollisionMatchResult(circleToAABBCollision(s2, s1), directOrder = false)
+    case (s1: AABBShape, s2: CircleShape) => CollisionMatchResult(circleToAABBCollision(s1, s2))
     case (s1: AABBShape, s2: AABBShape) => CollisionMatchResult(AABBtoAABBCollision(s1, s2))
   }
 

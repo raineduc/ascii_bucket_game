@@ -1,13 +1,12 @@
 package bucket_game
 
-import bucket_game.components.Component
-import bucket_game.domain.Body
+import bucket_game.game_management.{RenderAPI, Scene}
 import bucket_game.lib.vecmath.Vect2
 
 class ConsoleRenderAPI(
   val width: Int,
   val height: Int
-) {
+) extends RenderAPI {
   val matrix: Array[Array[Char]] = Array.fill[Char](height, width)(' ')
 
   initTerminal()

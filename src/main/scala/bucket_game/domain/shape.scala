@@ -73,7 +73,11 @@ object Shape {
 
     if (normalModule != 0) {
       val penetration: Float = (squaredRadius - normalModule).toFloat
-      Some(buildCollision(normal.normalize, penetration))
+
+      normal.normalize match {
+        case Some(n) => Some(buildCollision(n, penetration))
+        case _ => None
+      }
     }
     else Some(buildCollision(Vect2(1, 0), b1.radius))
   }
@@ -109,7 +113,12 @@ object Shape {
 
     val penetration = circle.radius - distanceSquared
 
-    Some(buildCollision(if (inside) (normal * -1).normalize else normal.normalize, penetration.toFloat))
+    val normalized = normal.normalize
+
+    normalized match {
+      case Some(n) => Some(buildCollision(if (inside) n * -1 else n, penetration.toFloat))
+      case _ => None
+    }
   }
 
   private def AABBtoAABBCollision(s1: AABBShape, s2: AABBShape): Option[CollisionFactory] = {

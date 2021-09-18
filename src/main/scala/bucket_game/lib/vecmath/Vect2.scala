@@ -10,7 +10,7 @@ final case class Vect2(x: Double, y: Double) {
 
   def getModule: Double = sqrt(lengthSquared)
 
-  def normalize: Vect2 = this * (1 / getModule)
+  def normalize: Option[Vect2] = if (isZero) None else Some(this * (1 / getModule))
 
   def isZero: Boolean = x == 0 && y == 0
 
@@ -25,12 +25,12 @@ final case class Vect2(x: Double, y: Double) {
   def *(coef: Double): Vect2 = Vect2(x * coef, y * coef)
 
   def dotProduct(that: Vect2): Double = {
-    if (isZero && that.isZero) 0
-    else x * that.x + y * that.y
+    x * that.x + y * that.y
   }
 
   def cosBetween(that: Vect2): Double = {
-    dotProduct(that) / getModule / that.getModule
+    if (isZero || that.isZero) 0
+    else dotProduct(that) / getModule / that.getModule
   }
 
   def angleBetween(that: Vect2): Double = {

@@ -1,8 +1,9 @@
-package bucket_game
+package bucket_game.game_management
 
 import bucket_game.domain.{Body, Collision, InfiniteMass, Shape}
+import bucket_game.lib.vecmath.Vect2
 
-import math.{abs, max, min}
+import scala.math.{abs, min}
 
 class PhysicsAPI {
   private val correctionPercent = 0.8f
@@ -34,7 +35,7 @@ class PhysicsAPI {
     val normalForceAcceleration = scene.gravity.getModule * abs(cosBetween)
     val scaledNormal = collision.normal * normalForceAcceleration
     val gravityScale = scaledNormal.getModule * cosBetween
-    val normalForceAccelerationProjection = scene.gravity.normalize * gravityScale // vector projection
+    val normalForceAccelerationProjection = scene.gravity.normalize.getOrElse(Vect2(0, 0)) * gravityScale // vector projection
 
     if (body1.mass != InfiniteMass)
       body1.velocity -= normalForceAccelerationProjection * scene.dt

@@ -12,5 +12,5 @@ class Ball(
   val mass: Float = shape.calculateMass(density)
   val restitution: Float = 1f
 
-  def this(radius: Float, centerPos: Vect2) = this(Vect2(0, 0), centerPos)
+  def this(centerPos: Vect2) = this(Vect2(0, 0), centerPos)
 }

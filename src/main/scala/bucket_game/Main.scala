@@ -1,24 +1,44 @@
 package bucket_game
 
-import bucket_game.components.Component
 import bucket_game.controller.UserInput
 import bucket_game.domain.{Ball, Bucket, Wall}
-import bucket_game.game_management.{GameManager, GameState, PhysicsAPI, Scene}
-import bucket_game.renderers.{BallRenderer, BucketRenderer, WallRenderer}
+import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene}
+import bucket_game.ui.renderers.{BallRenderer, BucketRenderer, WallRenderer}
 import bucket_game.lib.vecmath.Vect2
+import bucket_game.ui.{GameWindow, Panel, RenderAPIImpl}
+import org.jline.terminal.TerminalBuilder
 
 object Main extends App {
   val fps = 60
   val dt: Float = 1f / fps
 
-  val consoleRenderAPI = new ConsoleRenderAPI(100, 50)
+  private val terminal = TerminalBuilder.builder()
+    .jna(true)
+//    .system(true)
+    .build()
+  terminal.enterRawMode()
+
+  val gamePanel = new Panel(0, 10, 100, 50)
+  val gameWindow = new GameWindow(
+    gamePanel = gamePanel,
+    infoPanel = new Panel(0, 0, 100, 10)
+  )
+  val renderAPI = new RenderAPIImpl(100, 60, gameWindow, terminal)
   val physicsAPI = new PhysicsAPI()
 
-  val wallRenderer = new WallRenderer(consoleRenderAPI)
+  val wallRenderer = new WallRenderer(renderAPI, gamePanel)
 
 
-  val ballComponent = new Component[Ball](new Ball(Vect2(1, 0), Vect2(8, 40)), new BallRenderer(consoleRenderAPI))
-  val bucketComponent = new Component[Bucket](new Bucket(Vect2(80, 30), 6), new BucketRenderer(consoleRenderAPI))
+  val ballComponent = new Component[Ball](
+    new Ball(Vect2(1, 0), Vect2(8, 40)),
+    new BallRenderer(renderAPI, gamePanel)
+  )
+
+  val bucketComponent = new Component[Bucket](
+    new Bucket(Vect2(80, 30), 6),
+    new BucketRenderer(renderAPI, gamePanel)
+  )
+
   val components = List(
     ballComponent,
     bucketComponent,
@@ -35,10 +55,10 @@ object Main extends App {
     dt = dt
   )
 
-  val gameManager = new GameManager(scene, consoleRenderAPI)
-  val userInput = new UserInput(gameManager)
+  val gameManager = new GameManager(scene, renderAPI)
+  val userInput = new UserInput(gameManager, terminal = terminal)
 
-  consoleRenderAPI.renderScene(scene)
+  renderAPI.renderScene(scene)
   while (gameManager.state == GameState.Pending) {
     userInput.consumeCommandIfExists()
   }

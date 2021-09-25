@@ -1,12 +1,12 @@
-package bucket_game.renderers
+package bucket_game.ui.renderers
 
-import bucket_game.components.Renderer
 import bucket_game.domain.Ball
-import bucket_game.ConsoleRenderAPI
-import bucket_game.lib.vecmath.Vect2
+import bucket_game.game_management.Renderer
+import bucket_game.ui.{Panel, RenderAPIImpl}
 
 class BallRenderer(
-                  private val renderAPI: ConsoleRenderAPI
+                    renderAPI: RenderAPIImpl,
+                    gamePanel: Panel
                   ) extends Renderer[Ball] {
   private val texture =
     """
@@ -21,7 +21,7 @@ class BallRenderer(
   private val splittedTexture = texture.split("(\r\n)|\n").map(line => line.zipWithIndex).zipWithIndex
 
   def render(body: Ball): Unit = {
-    val (left, top) = renderAPI.cartesianToConsole(body.position)
+    val (left, top) = gamePanel.cartesianToPanelCoordinates(body.position)
 
     for {
       (line, heightOffset) <- splittedTexture
@@ -29,7 +29,7 @@ class BallRenderer(
       (char, widthOffset) <- line
       if (left + widthOffset) <= renderAPI.width && char != ' '
     } {
-      renderAPI.setPixel(left + widthOffset, top + heightOffset, char)
+      gamePanel.setPixel(left + widthOffset, top + heightOffset, char)
     }
   }
 }

@@ -1,6 +1,5 @@
 package bucket_game.game_management
 
-import bucket_game.components.Component
 import bucket_game.domain.{Ball, Body, Bucket}
 import bucket_game.lib.vecmath.Vect2
 

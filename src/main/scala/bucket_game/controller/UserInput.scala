@@ -2,21 +2,18 @@ package bucket_game.controller
 
 import bucket_game.game_management.GameManager
 import org.jline.keymap.{BindingReader, KeyMap}
-import org.jline.terminal.TerminalBuilder
+import org.jline.terminal.{Terminal, TerminalBuilder}
 
 import scala.math.Pi
 
 class UserInput(
                  private val gameManager: GameManager,
                  var velocityStep: Float = 1f,
-                 var rotationStep: Float = (Pi / 24).toFloat
+                 var rotationStep: Float = (Pi / 24).toFloat,
+                 terminal: Terminal
                ) {
   private val maxCommandLen = 3
-  private val terminal = TerminalBuilder.builder()
-    .jna(true)
-    .system(true)
-    .build()
-  terminal.enterRawMode()
+
   private val reader = terminal.reader()
 
   private val keyMap = new KeyMap[Action.Value]

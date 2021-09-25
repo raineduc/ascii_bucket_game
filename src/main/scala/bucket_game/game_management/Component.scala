@@ -1,4 +1,4 @@
-package bucket_game.components
+package bucket_game.game_management
 
 import bucket_game.domain.Body
 

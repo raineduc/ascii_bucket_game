@@ -20,7 +20,7 @@ class RenderAPIImpl(
     for (component <- scene.components) {
       component.render()
     }
-    for (panel <- gameWindow.panels) panel.render(windowAPI)
+    for (panel <- gameWindow.panels) panel.render(windowAPI, scene)
 
     windowAPI.renderScreen()
   }

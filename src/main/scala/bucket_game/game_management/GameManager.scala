@@ -7,7 +7,8 @@ import java.time.temporal.ChronoUnit
 
 class GameManager(
                    val scene: Scene,
-                   val renderAPI: RenderAPI
+                   val renderAPI: RenderAPI,
+                   val controller: Controller
                  ) {
   private val physicsAPI = new PhysicsAPI()
   var state: GameState.Value = GameState.Pending
@@ -41,7 +42,9 @@ class GameManager(
 
   def startRound(): Unit = {
     state = GameState.Running
+  }
 
+  def startLoop(): Unit = {
     var accumulator: Double = 0
 
     var frameStart = Instant.now()
@@ -51,10 +54,11 @@ class GameManager(
 
       frameStart = currentTime
       while (accumulator > scene.dt) {
-        physicsAPI.updatePhysics(scene)
+        if (state == GameState.Running) physicsAPI.updatePhysics(scene)
         accumulator -= scene.dt
       }
       renderAPI.renderScene(scene)
+      controller.consumeCommandIfExists(this)
       Thread.sleep(50)
     }
   }

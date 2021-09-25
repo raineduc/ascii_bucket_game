@@ -1,17 +1,16 @@
 package bucket_game.controller
 
-import bucket_game.game_management.GameManager
+import bucket_game.game_management.{Controller, GameManager, GameState}
 import org.jline.keymap.{BindingReader, KeyMap}
 import org.jline.terminal.{Terminal, TerminalBuilder}
 
 import scala.math.Pi
 
 class UserInput(
-                 private val gameManager: GameManager,
                  var velocityStep: Float = 1f,
                  var rotationStep: Float = (Pi / 24).toFloat,
                  terminal: Terminal
-               ) {
+               ) extends Controller {
   private val maxCommandLen = 3
 
   private val reader = terminal.reader()
@@ -37,17 +36,18 @@ class UserInput(
     readBinding("")
   }
 
-  def consumeCommandIfExists(): Unit = {
-    val action = readBinding()
-
-    action match {
-      case Action.Right => gameManager.increaseBallVelocity(velocityStep)
-      case Action.Left => gameManager.decreaseBallVelocity(velocityStep)
-      case Action.Up => gameManager.rotateBallDirection(rotationStep)
-      case Action.Down => gameManager.decreaseBallVelocity(-rotationStep)
-      case Action.Start => gameManager.startRound()
-      case Action.ExitProgram => System.exit(0)
-      case _ =>
+  def consumeCommandIfExists(gameManager: GameManager): Unit = {
+    if (gameManager.state == GameState.Pending) {
+      val action = readBinding()
+      action match {
+        case Action.Right => gameManager.increaseBallVelocity(velocityStep)
+        case Action.Left => gameManager.decreaseBallVelocity(velocityStep)
+        case Action.Up => gameManager.rotateBallDirection(rotationStep)
+        case Action.Down => gameManager.decreaseBallVelocity(-rotationStep)
+        case Action.Start => gameManager.startRound()
+        case Action.ExitProgram => System.exit(0)
+        case _ =>
+      }
     }
   }
 }

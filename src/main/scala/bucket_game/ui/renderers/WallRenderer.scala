@@ -2,11 +2,12 @@ package bucket_game.ui.renderers
 
 import bucket_game.domain.Wall
 import bucket_game.game_management.Renderer
-import bucket_game.ui.{Panel, RenderAPIImpl}
+import bucket_game.ui.RenderAPIImpl
+import bucket_game.ui.panels.CommonPanel
 
 class WallRenderer(
                     renderAPI: RenderAPIImpl,
-                    gamePanel: Panel
+                    gamePanel: CommonPanel
                   ) extends Renderer[Wall] {
   private def renderHorizontalWall(body: Wall): Unit = {
     val (left, top) = gamePanel.cartesianToPanelCoordinates(body.position)

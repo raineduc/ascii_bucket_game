@@ -1,9 +1,8 @@
 package bucket_game.ui.panels
 
 import bucket_game.game_management.Scene
-import bucket_game.lib.vecmath.Vect2
 import bucket_game.ui.ConsoleWindowAPI
-
+import bucket_game.lib.vecmath.polarAngle
 import scala.math.toDegrees
 
 class InfoCommonPanel(
@@ -12,9 +11,6 @@ class InfoCommonPanel(
                  width: Int,
                  height: Int
                ) extends CommonPanel(positionX, positionY, width, height) {
-  // zero angle vector
-  private val referenceVector = Vect2(1, 0)
-
   // parse [] in the line and fill this place with spaces
   // so that the line length equals to width argument
   private def fillWithSpaces(line: String): String = {
@@ -35,7 +31,7 @@ class InfoCommonPanel(
 
   private def fillMatrix(scene: Scene): Unit = {
     val ball = scene.ball
-    val lines = panelString(ball.velocity.getModule, ball.velocity.angleBetween(referenceVector)).split("\n")
+    val lines = panelString(ball.velocity.getModule, polarAngle(ball.velocity)).split("\n")
     for {
       (line, y) <- lines.zipWithIndex
       (char, x) <- line.zipWithIndex

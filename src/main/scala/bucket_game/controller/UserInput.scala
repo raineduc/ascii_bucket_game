@@ -43,7 +43,7 @@ class UserInput(
         case Action.Right => gameManager.increaseBallVelocity(velocityStep)
         case Action.Left => gameManager.decreaseBallVelocity(velocityStep)
         case Action.Up => gameManager.rotateBallDirection(rotationStep)
-        case Action.Down => gameManager.decreaseBallVelocity(-rotationStep)
+        case Action.Down => gameManager.rotateBallDirection(-rotationStep)
         case Action.Start => gameManager.startRound()
         case Action.ExitProgram => System.exit(0)
         case _ =>

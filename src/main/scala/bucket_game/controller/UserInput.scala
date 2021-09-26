@@ -1,6 +1,6 @@
 package bucket_game.controller
 
-import bucket_game.game_management.{Controller, GameManager, GameState, Pending}
+import bucket_game.game_management.{Controller, GameManager, GameOver, GameState, Pending, RoundFinished}
 import org.jline.keymap.{BindingReader, KeyMap}
 import org.jline.terminal.{Terminal, TerminalBuilder}
 
@@ -46,6 +46,20 @@ class UserInput(
           case Action.Up => gameManager.rotateBallDirection(rotationStep)
           case Action.Down => gameManager.rotateBallDirection(-rotationStep)
           case Action.Start => gameManager.startAction()
+          case Action.ExitProgram => System.exit(0)
+          case _ =>
+        }
+      case RoundFinished(_) =>
+        val action = readBinding()
+        action match {
+          case Action.Start => gameManager.startNextRound()
+          case Action.ExitProgram => System.exit(0)
+          case _ =>
+        }
+      case GameOver() =>
+        val action = readBinding()
+        action match {
+          case Action.Start => gameManager.startRound()
           case Action.ExitProgram => System.exit(0)
           case _ =>
         }

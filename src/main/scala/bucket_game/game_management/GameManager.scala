@@ -9,17 +9,32 @@ import java.util.{Timer, TimerTask}
 import scala.math.signum
 
 class GameManager(
-                   val scene: Scene,
+                   val scenes: Seq[SceneFactory],
                    val renderAPI: RenderAPI,
                    val controller: Controller
                  ) {
+  require(scenes.nonEmpty)
+  private var scene = scenes.head.scene()
+
   private val physicsAPI = new PhysicsAPI()
   private val PenetrationThreshold = scene.ball.radius / 2
-  private var currentCollisionNormal: Option[Vect2] = None
-  private var success = false
   private val VelocityThreshold = 0.1f
   private val TimeThreshold = 5
+
+  private var currentSceneIndex = 0
+  private var currentCollisionNormal: Option[Vect2] = None
+  private var success = false
   private var countdownTimestamp: Option[Instant] = None
+
+  private def setRound(index: Int): Unit = {
+    currentSceneIndex = if (index < scenes.length) index else 0
+    scene = scenes(currentSceneIndex).scene()
+    currentCollisionNormal = None
+    success = false
+    countdownTimestamp = None
+  }
+
+  private def nextRound(): Unit = setRound(currentSceneIndex + 1)
 
   scene.state = Pending()
 
@@ -105,8 +120,18 @@ class GameManager(
   }
 
   def startRound(): Unit = {
+    setRound(0)
     scene.state = Pending()
     startLoop()
+  }
+
+  def startNextRound(): Unit = {
+    if (currentSceneIndex == scenes.length - 1) {
+      scene.state = GameOver()
+    } else {
+      nextRound()
+      scene.state = Pending()
+    }
   }
 
   def startLoop(): Unit = {

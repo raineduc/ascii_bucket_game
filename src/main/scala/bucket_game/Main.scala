@@ -2,7 +2,7 @@ package bucket_game
 
 import bucket_game.controller.UserInput
 import bucket_game.domain.{Ball, Bucket, Wall}
-import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene}
+import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene, SceneFactory}
 import bucket_game.ui.renderers.{BallRenderer, BucketRenderer, WallRenderer}
 import bucket_game.lib.vecmath.Vect2
 import bucket_game.ui.panels.{CommonPanel, InfoCommonPanel, RoundResultPanel}
@@ -15,7 +15,7 @@ object Main extends App {
 
   private val terminal = TerminalBuilder.builder()
     .jna(true)
-//    .system(true)
+    //    .system(true)
     .build()
   terminal.enterRawMode()
 
@@ -32,33 +32,39 @@ object Main extends App {
   val wallRenderer = new WallRenderer(renderAPI, gamePanel)
 
 
-  val ballComponent = new Component[Ball](
-    new Ball(Vect2(1, 0), Vect2(8, 40)),
-    new BallRenderer(renderAPI, gamePanel)
-  )
+  val sceneFactory1: SceneFactory = () => {
+    val ballComponent = new Component[Ball](
+      new Ball(Vect2(1, 0), Vect2(8, 40)),
+      new BallRenderer(renderAPI, gamePanel)
+    )
 
-  val bucketComponent = new Component[Bucket](
-    new Bucket(Vect2(80, 30), 6),
-    new BucketRenderer(renderAPI, gamePanel)
-  )
+    val bucketComponent = new Component[Bucket](
+      new Bucket(Vect2(80, 30), 6),
+      new BucketRenderer(renderAPI, gamePanel)
+    )
 
-  val components = List(
-    ballComponent,
-    bucketComponent,
-    new Component[Wall](new Wall(Vect2(0, 49), 100, true), wallRenderer),
-    new Component[Wall](new Wall(Vect2(99, 48), 49), wallRenderer),
-    new Component[Wall](new Wall(Vect2(1, 0), 98, true), wallRenderer),
-    new Component[Wall](new Wall(Vect2(0, 48), 48), wallRenderer)
-  )
+    val components = List(
+      ballComponent,
+      bucketComponent,
+      new Component[Wall](new Wall(Vect2(0, 49), 100, true), wallRenderer),
+      new Component[Wall](new Wall(Vect2(99, 48), 49), wallRenderer),
+      new Component[Wall](new Wall(Vect2(1, 0), 98, true), wallRenderer),
+      new Component[Wall](new Wall(Vect2(0, 48), 48), wallRenderer)
+    )
 
-  val scene = Scene(
-    components = components,
-    ballComponent.gameObject,
-    bucketComponent.gameObject,
-    dt = dt
+    Scene(
+      components = components,
+      ballComponent.gameObject,
+      bucketComponent.gameObject,
+      dt = dt
+    )
+  }
+
+  val sceneFactories = IndexedSeq(
+    sceneFactory1
   )
 
   val userInput = new UserInput(terminal = terminal)
-  val gameManager = new GameManager(scene, renderAPI, userInput)
+  val gameManager = new GameManager(sceneFactories, renderAPI, userInput)
   gameManager.startRound()
 }

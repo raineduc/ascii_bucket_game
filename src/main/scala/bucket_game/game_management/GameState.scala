@@ -9,3 +9,5 @@ case class Running() extends GameState
 case class RoundFinished(
                           success: Boolean
                         ) extends GameState
+
+case class GameOver() extends GameState

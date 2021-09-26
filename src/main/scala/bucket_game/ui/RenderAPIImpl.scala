@@ -1,6 +1,7 @@
 package bucket_game.ui
 
-import bucket_game.game_management.{RenderAPI, Scene}
+import bucket_game.game_management.Scene
+import bucket_game.game_management.interfaces.RenderAPI
 import bucket_game.lib.vecmath.Vect2
 import org.jline.terminal.Terminal
 

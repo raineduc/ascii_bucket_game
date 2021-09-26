@@ -1,6 +1,7 @@
 package bucket_game.controller
 
-import bucket_game.game_management.{Controller, GameManager, GameOver, GameState, Pending, RoundFinished, Running}
+import bucket_game.game_management.interfaces.Controller
+import bucket_game.game_management.{GameManager, GameOver, GameState, Pending, RoundFinished, Running}
 import org.jline.keymap.{BindingReader, KeyMap}
 import org.jline.terminal.{Terminal, TerminalBuilder}
 

@@ -1,7 +1,7 @@
 package bucket_game.ui.renderers
 
 import bucket_game.domain.Bucket
-import bucket_game.game_management.Renderer
+import bucket_game.game_management.interfaces.Renderer
 import bucket_game.ui.RenderAPIImpl
 import bucket_game.ui.panels.CommonPanel
 

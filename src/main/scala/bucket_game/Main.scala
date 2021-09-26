@@ -2,7 +2,8 @@ package bucket_game
 
 import bucket_game.controller.UserInput
 import bucket_game.domain.{Ball, Bucket, Wall}
-import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene, SceneFactory}
+import bucket_game.game_management.interfaces.SceneFactory
+import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene}
 import bucket_game.ui.renderers.{BallRenderer, BucketRenderer, WallRenderer}
 import bucket_game.lib.vecmath.Vect2
 import bucket_game.ui.panels.{CommonPanel, GameOverPanel, InfoCommonPanel, RoundResultPanel}

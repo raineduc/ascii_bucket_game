@@ -1,4 +1,4 @@
-package bucket_game.game_management
+package bucket_game.game_management.interfaces
 
 import bucket_game.domain.Body
 

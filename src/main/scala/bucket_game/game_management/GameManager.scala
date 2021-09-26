@@ -1,6 +1,7 @@
 package bucket_game.game_management
 
 import bucket_game.domain.Shape
+import bucket_game.game_management.interfaces.{Controller, RenderAPI, SceneFactory}
 import bucket_game.lib.vecmath.{Vect2, rotateVect2}
 
 import java.time.Instant

@@ -1,5 +1,6 @@
-package bucket_game.game_management
+package bucket_game.game_management.interfaces
 
+import bucket_game.game_management.Scene
 
 /*
 * Scene objects are to complicated to deep clone, therefore

@@ -1,9 +1,10 @@
 package bucket_game.controller
 
-import bucket_game.game_management.{Controller, GameManager, GameOver, GameState, Pending, RoundFinished}
+import bucket_game.game_management.{Controller, GameManager, GameOver, GameState, Pending, RoundFinished, Running}
 import org.jline.keymap.{BindingReader, KeyMap}
 import org.jline.terminal.{Terminal, TerminalBuilder}
 
+import java.util.{Timer, TimerTask}
 import scala.math.Pi
 
 class UserInput(
@@ -14,15 +15,21 @@ class UserInput(
   private val maxCommandLen = 3
 
   private val reader = terminal.reader()
-
   private val keyMap = new KeyMap[Action.Value]
   keyMap.bind(Action.Up, "\u001b[A")
+  keyMap.bind(Action.Up, "\u001bOA")
   keyMap.bind(Action.Down, "\u001b[B")
+  keyMap.bind(Action.Down, "\u001bOB")
   keyMap.bind(Action.Right, "\u001b[C")
+  keyMap.bind(Action.Right, "\u001bOC")
   keyMap.bind(Action.Left, "\u001b[D")
+  keyMap.bind(Action.Left, "\u001bOD")
   keyMap.bind(Action.Start, "\u000d")
+  keyMap.bind(Action.ExitProgram, KeyMap.esc())
+  keyMap.bind(Action.ExitProgram, KeyMap.ctrl('c'))
+  keyMap.bind(Action.ExitProgram, KeyMap.ctrl('C'))
+  keyMap.bind(Action.ExitProgram, "\u001bc")
   keyMap.bind(Action.ExitProgram, "\u001bC")
-
 
   private def readBinding(str: String): Action.Value = {
     if (str.length < maxCommandLen) {
@@ -34,6 +41,13 @@ class UserInput(
 
   private def readBinding(): Action.Value = {
     readBinding("")
+  }
+
+  private def readEscape(): Boolean = {
+    readBinding() match {
+      case Action.ExitProgram => true
+      case _ => false
+    }
   }
 
   def consumeCommandIfExists(gameManager: GameManager): Unit = {
@@ -63,7 +77,8 @@ class UserInput(
           case Action.ExitProgram => System.exit(0)
           case _ =>
         }
-      case _ =>
+      case Running() =>
+      case _ => if (readEscape()) System.exit(0)
     }
   }
 }

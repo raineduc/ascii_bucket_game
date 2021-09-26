@@ -154,7 +154,6 @@ class GameManager(
       }
       renderAPI.renderScene(scene)
       controller.consumeCommandIfExists(this)
-      Thread.sleep(50)
     }
   }
 }

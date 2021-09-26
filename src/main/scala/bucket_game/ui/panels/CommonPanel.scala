@@ -15,4 +15,6 @@ class CommonPanel(
       (char, x) <- matrix(y).zipWithIndex
     } consoleWindowAPI.setPixel(positionX + x, positionY + y, char)
   }
+
+  def clear(): Unit = clearMatrix()
 }

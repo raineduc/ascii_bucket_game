@@ -12,6 +12,8 @@ trait Panel {
 
   def render(consoleWindowAPI: ConsoleWindowAPI, scene: Scene): Unit
 
+  def clear(): Unit
+
   def cartesianToPanelCoordinates(vect: Vect2): (Int, Int) = {
     (vect.x.round.toInt, (height - vect.y - 1).round.toInt)
   }

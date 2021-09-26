@@ -1,10 +1,10 @@
 package bucket_game.ui
 
-import bucket_game.ui.panels.CommonPanel
+import bucket_game.ui.panels.Panel
 
 class GameWindow(
-                  val gamePanel: CommonPanel,
-                  val infoPanel: CommonPanel
+                  val gamePanel: Panel,
+                  val infoPanel: Panel
                 ) {
-  val panels = List(gamePanel, infoPanel)
+  var panels = List(gamePanel, infoPanel)
 }

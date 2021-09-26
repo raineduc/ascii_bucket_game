@@ -3,6 +3,7 @@ package bucket_game.ui.panels
 import bucket_game.game_management.Scene
 import bucket_game.ui.ConsoleWindowAPI
 import bucket_game.lib.vecmath.polarAngle
+import bucket_game.lib.string_utils.fillWithSpaces
 import scala.math.toDegrees
 
 class InfoCommonPanel(
@@ -11,21 +12,15 @@ class InfoCommonPanel(
                  width: Int,
                  height: Int
                ) extends CommonPanel(positionX, positionY, width, height) {
-  // parse [] in the line and fill this place with spaces
-  // so that the line length equals to width argument
-  private def fillWithSpaces(line: String): String = {
-    line.replaceFirst("\\[\\]", " " * (width - line.length + 3))
-  }
-
   private def panelString(velocity: Double, angle: Double): String =
     s"${"-" * width}\n" +
-      fillWithSpaces {
+      fillWithSpaces(width) {
         f"|ball velocity: $velocity%.2f[]|\n"
       } +
-      fillWithSpaces {
+      fillWithSpaces(width) {
         f"|ball direction degree: ${toDegrees(angle)}%.2f[]|\n"
       } +
-      fillWithSpaces("|[]|\n") * (height - 4) +
+      fillWithSpaces(width)("|[]|\n") * (height - 4) +
       s"${"-" * width}\n"
 
 

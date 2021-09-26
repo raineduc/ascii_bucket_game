@@ -28,9 +28,7 @@ class PhysicsAPI {
 
 
   // subtracts from gravity the normal force projection onto it
-  private def correctPosition(scene: Scene, collision: Collision): Unit = {
-    val (body1, body2) = (collision.firstBody, collision.secondBody)
-
+  private def correctPosition(scene: Scene, collision: Collision, body1: Body, body2: Body): Unit = {
     val cosBetween = scene.gravity.cosBetween(collision.normal)
     val normalForceAcceleration = scene.gravity.getModule * abs(cosBetween)
     val scaledNormal = collision.normal * normalForceAcceleration
@@ -43,10 +41,7 @@ class PhysicsAPI {
       body2.velocity += normalForceAccelerationProjection * scene.dt
   }
 
-  def resolveCollision(collision: Collision): Unit = {
-    val body1 = collision.firstBody
-    val body2 = collision.secondBody
-
+  def resolveCollision(collision: Collision, body1: Body, body2: Body): Unit = {
     val relativeVelocity = body2.velocity - body1.velocity
     val velocityAlongNormal = collision.normal dotProduct relativeVelocity
 
@@ -76,10 +71,10 @@ class PhysicsAPI {
       (component2, idY) <- scene.components.zipWithIndex
       if idX < idY
     } {
-      Shape.defineCollision(component1.gameObject, component2.gameObject) match {
+      Shape.defineCollision(component1.gameObject.shape, component2.gameObject.shape) match {
         case Some(collision) => {
-          resolveCollision(collision)
-          correctPosition(scene, collision)
+          resolveCollision(collision, component1.gameObject, component2.gameObject)
+          correctPosition(scene, collision, component1.gameObject, component2.gameObject)
         }
         case _ =>
       }

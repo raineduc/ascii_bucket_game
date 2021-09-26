@@ -1,6 +1,6 @@
 package bucket_game.controller
 
-import bucket_game.game_management.{Controller, GameManager, GameState}
+import bucket_game.game_management.{Controller, GameManager, GameState, Pending}
 import org.jline.keymap.{BindingReader, KeyMap}
 import org.jline.terminal.{Terminal, TerminalBuilder}
 
@@ -37,17 +37,19 @@ class UserInput(
   }
 
   def consumeCommandIfExists(gameManager: GameManager): Unit = {
-    if (gameManager.state == GameState.Pending) {
-      val action = readBinding()
-      action match {
-        case Action.Right => gameManager.increaseBallVelocity(velocityStep)
-        case Action.Left => gameManager.decreaseBallVelocity(velocityStep)
-        case Action.Up => gameManager.rotateBallDirection(rotationStep)
-        case Action.Down => gameManager.rotateBallDirection(-rotationStep)
-        case Action.Start => gameManager.startRound()
-        case Action.ExitProgram => System.exit(0)
-        case _ =>
-      }
+    gameManager.state match {
+      case Pending() =>
+        val action = readBinding()
+        action match {
+          case Action.Right => gameManager.increaseBallVelocity(velocityStep)
+          case Action.Left => gameManager.decreaseBallVelocity(velocityStep)
+          case Action.Up => gameManager.rotateBallDirection(rotationStep)
+          case Action.Down => gameManager.rotateBallDirection(-rotationStep)
+          case Action.Start => gameManager.startAction()
+          case Action.ExitProgram => System.exit(0)
+          case _ =>
+        }
+      case _ =>
     }
   }
 }

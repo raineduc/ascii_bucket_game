@@ -1,5 +1,11 @@
 package bucket_game.game_management
 
-object GameState extends Enumeration {
-  val Pending, Running, RoundFinished = Value
-}
+abstract class GameState
+
+case class Pending() extends GameState
+
+case class Running() extends GameState
+
+case class RoundFinished(
+                          success: Boolean
+                        ) extends GameState

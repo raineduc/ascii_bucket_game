@@ -5,7 +5,7 @@ import bucket_game.domain.{Ball, Bucket, Wall}
 import bucket_game.game_management.{Component, GameManager, GameState, PhysicsAPI, Scene}
 import bucket_game.ui.renderers.{BallRenderer, BucketRenderer, WallRenderer}
 import bucket_game.lib.vecmath.Vect2
-import bucket_game.ui.panels.{CommonPanel, InfoCommonPanel}
+import bucket_game.ui.panels.{CommonPanel, InfoCommonPanel, RoundResultPanel}
 import bucket_game.ui.{GameWindow, RenderAPIImpl}
 import org.jline.terminal.TerminalBuilder
 
@@ -24,6 +24,7 @@ object Main extends App {
     gamePanel = gamePanel,
     infoPanel = new InfoCommonPanel(width = 100, height = 10)
   )
+  gameWindow.panels :+= new RoundResultPanel(100, 60)
 
   val renderAPI = new RenderAPIImpl(100, 60, gameWindow, terminal)
   val physicsAPI = new PhysicsAPI()
@@ -50,7 +51,7 @@ object Main extends App {
     new Component[Wall](new Wall(Vect2(0, 48), 48), wallRenderer)
   )
 
-  val scene = new Scene(
+  val scene = Scene(
     components = components,
     ballComponent.gameObject,
     bucketComponent.gameObject,
@@ -59,5 +60,5 @@ object Main extends App {
 
   val userInput = new UserInput(terminal = terminal)
   val gameManager = new GameManager(scene, renderAPI, userInput)
-  gameManager.startLoop()
+  gameManager.startRound()
 }

@@ -15,13 +15,19 @@ class RenderAPIImpl(
   def renderScene(scene: Scene): Unit = {
     windowAPI.clear()
 
-    for (panel <- gameWindow.panels) panel.clearMatrix()
+    for (panel <- gameWindow.panels) panel.clear()
 
     for (component <- scene.components) {
       component.render()
     }
     for (panel <- gameWindow.panels) panel.render(windowAPI, scene)
 
+    windowAPI.renderScreen()
+  }
+
+  def roundFinished(scene: Scene, success: Boolean): Unit = {
+    windowAPI.clear()
+    for (panel <- gameWindow.panels) panel.render(windowAPI, scene)
     windowAPI.renderScreen()
   }
 
